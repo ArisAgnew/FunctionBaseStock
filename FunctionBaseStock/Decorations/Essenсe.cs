@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Reflection;
-using FunctionBaseStock.Enhancements;
-using FunctionBaseStock.Enhancements.HighEndAbstraction;
 
 namespace FunctionBaseStock.Decorations
 {
@@ -33,20 +28,11 @@ namespace FunctionBaseStock.Decorations
         {
             Type delegetaType = _delegate.GetType();
 
-            dynamic? amplifiedDelegate = default;
+            dynamic? amplifiedDelegate = Activator.CreateInstance(_amplifiedType, _delegate);
             dynamic? result = default;
 
             try
             {
-                IEnumerable<Type> amplifiedTypes = AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(s => s.GetTypes())
-                    .Where(p => _amplifiedType.Name.Equals(p.Name));
-
-                foreach (Type aType in amplifiedTypes)
-                {
-                    amplifiedDelegate = Activator.CreateInstance(aType, _delegate);
-                }
-
                 result = _delegate.GetType().Name switch
                 {
                     string fullFunc when fullFunc == typeof(Func<,>).Name => amplifiedDelegate?.Apply(input),
